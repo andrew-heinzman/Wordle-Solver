@@ -59,13 +59,13 @@ calc_score <- function(guess, word_list = wordle_answer_list){
 }
 
 # Generating scores for the first guess -----------------------------------
-if(!file.exists(here("data", "first_word_scores.csv"))){
+if(!file.exists(here("results", "first_word_scores.csv"))){
   word_scores <- tibble(words = wordle_guess_list) %>%
     mutate(scores = future_map_dbl(words, calc_score),
            potential_answer = words %in% wordle_answer_list) %>%
     arrange(scores)
   
-  # write_csv(word_scores, here("data", "first_word_scores.csv"))
+  write_csv(word_scores, here("results", "first_word_scores.csv"))
 }
 # 'roate' has the lowest expected number of words in the posterior set (60.4).
 # 'raise' has the second lowest expected number of words in the posterior set (61).
@@ -105,8 +105,8 @@ gen_new_guess <- function(potential_answers, master_guess_list = wordle_guess_li
 
 # Second round best guesses -----------------------------------------------
 # Generating the best second guesses given 'raise' was guessed first
-if(file.exists(here("data", "second_word_guesses.csv"))){
-  second_word_guesses <- read_csv(here("data", "second_word_guesses.csv"))
+if(file.exists(here("results", "second_word_guesses.csv"))){
+  second_word_guesses <- read_csv(here("results", "second_word_guesses.csv"))
 } else{
   # Generate the best second round guesses after playing 'raise' in the first round
   second_word_guesses <- tibble("potential_answers" = wordle_answer_list,
@@ -122,7 +122,7 @@ if(file.exists(here("data", "second_word_guesses.csv"))){
   second_word_guesses %>% 
     select(-data) %>%
     mutate(results = glue(" {results}")) %>% # adding a leading space to make CSV open-able in Excel
-    write_csv(here("data", "second_word_guesses.csv"))
+    write_csv(here("results", "second_word_guesses.csv"))
 }
 
 # Saving best second guesses as a vector that can be easily looked up off of
@@ -199,13 +199,13 @@ wordle_solver <- function(true_answer,
 # wordle_solver("thick")
 
 # Calculating turns to solve all potential answers ------------------------
-if(!file.exists(here("data", "turns_to_solve.csv"))){
+if(!file.exists(here("results", "turns_to_solve.csv"))){
   turns_to_solve <- cbind("true_answer" = wordle_answer_list,
                           future_map_dfr(wordle_answer_list, ~wordle_solver(.x, print_guess = F)))
 
-  write_csv(turns_to_solve, here("data", "turns_to_solve.csv"))
+  write_csv(turns_to_solve, here("results", "turns_to_solve.csv"))
 } else {
-  turns_to_solve <- read_csv(here("data", "turns_to_solve.csv"))
+  turns_to_solve <- read_csv(here("results", "turns_to_solve.csv"))
 }
 
 summary(turns_to_solve$total_guesses)
