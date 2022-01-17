@@ -1,11 +1,13 @@
+if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse,
                furrr,
                here,
                glue)
 
-plan(multisession)
+plan(multisession) # Setting up parallel processing for future_map
 
-# worlde answer and guess list from Cyrus Freshman via: https://www.reddit.com/r/wordle/comments/s4tcw8/a_note_on_wordles_word_list/
+# Reading in word lists ---------------------------------------------------
+# Worlde answer and guess list from Cyrus Freshman via: https://www.reddit.com/r/wordle/comments/s4tcw8/a_note_on_wordles_word_list/
 wordle_answer_list <- read_delim("https://gist.githubusercontent.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b/raw/a9e55d7e0c08100ce62133a1fa0d9c4f0f542f2c/wordle-answers-alphabetical.txt",
                              delim = "\n",
                              col_names = F
@@ -21,6 +23,7 @@ wordle_guess_only_list <- read_delim("https://gist.githubusercontent.com/cfreshm
 
 wordle_guess_list <- c(wordle_answer_list, wordle_guess_only_list)
 
+# Preliminary functions ---------------------------------------------------
 check_guess <- function(guess, answer){
   # Function to return the Wordle output given a guess and correct answer
     # - represents that letter does not occur in the answer
@@ -103,10 +106,10 @@ gen_new_guess <- function(potential_answers, master_guess_list = wordle_guess_li
 # Second round best guesses -----------------------------------------------
 # Generating the best second guesses given 'raise' was guessed first
 if(file.exists(here("data", "second_word_guesses.csv"))){
-  first_round_results <- read_csv(here("data", "second_word_guesses.csv"))
+  second_word_guesses <- read_csv(here("data", "second_word_guesses.csv"))
 } else{
   # Generate the best second round guesses after playing 'raise' in the first round
-  first_round_results <- tibble("potential_answers" = wordle_answer_list,
+  second_word_guesses <- tibble("potential_answers" = wordle_answer_list,
                                 "results" = map_chr(wordle_answer_list, ~ check_guess("raise", .x))) %>% 
     # grouping together the potential answers by the result after guessing 'raise'
     group_by(results) %>% 
@@ -116,16 +119,15 @@ if(file.exists(here("data", "second_word_guesses.csv"))){
     mutate(new_guess = future_map_chr(data, ~gen_new_guess(.x$potential_answers)),
            words_remaining = map_int(data , ~dim(.x)[1]))
   
-  first_round_results %>% 
+  second_word_guesses %>% 
     select(-data) %>%
     mutate(results = glue(" {results}")) %>% # adding a leading space to make CSV open-able in Excel
     write_csv(here("data", "second_word_guesses.csv"))
 }
 
 # Saving best second guesses as a vector that can be easily looked up off of
-second_guess <- first_round_results$new_guess
-names(second_guess) <- first_round_results$results
-
+second_guess <- second_word_guesses$new_guess
+names(second_guess) <- second_word_guesses$results
 
 # Round by round Wordle play ----------------------------------------------
 play_round <- function(guess, result, prior_word_list, 
