@@ -48,7 +48,11 @@ calc_score <- function(guess, word_list = wordle_answer_list){
   # generate all of the potential outcomes
   res <- check_guess(guess, word_list) %>% 
     # calculating how often each outcome occurs
-    table() %>% 
+    table() 
+  # if the guess is correct there are 0 words remaining
+  res["GGGGG"] = 0
+  
+  res <- res %>% 
     # squaring the number of occurrences because the probability of that outcome is
       # number of occurrences / total number of words in word list
     .^2 %>% 
@@ -85,7 +89,10 @@ posterior_words <- function(guess, result, potential_answers){
 gen_new_guess <- function(potential_answers, master_guess_list = wordle_guess_list) {
   # Takes a vector of potential_answers and generates the best guess from master_guess_list
   
-  # If there are less than two potential answers it is best to guess randomly from answers
+  # If there are less than two potential answers it is best to guess randomly from answers.
+  # If there are three potential answers left then guessing randomly will take 
+  # 2 guesses in expectation. However, if there is a non-answer guess that can 
+  # determine the answer perfectly that will take 2 guesses for certain and is preferred.
   if(length(potential_answers) <= 2){
     return(potential_answers[1])
   }
