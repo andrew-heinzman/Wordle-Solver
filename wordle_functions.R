@@ -174,9 +174,14 @@ play_round <- function(guess, result, prior_word_list,
   ))
 }
 
-# rnd1 <- play_round("raise", "--G--", wordle_answer_list)
-# rnd2 <- play_round("clint", "Y-G-Y", rnd1$updated_word_list)
-# rnd3 <- play_round("thick", "GGGGG", rnd2$updated_word_list)
+rnd1 <- play_round("raise", check_guess("raise", "thorn"), wordle_answer_list)
+rnd2 <- play_round("clout", check_guess("clout", "thorn"), rnd1$updated_word_list)
+# rnd3 <- play_round("shill", check_guess("shill", "tacit"), rnd2$updated_word_list)
+
+scores <- map_dbl(rnd2$updated_word_list, ~calc_score(.x, rnd2$updated_word_list))
+names(scores) <- rnd2$updated_word_list
+scores <- sort(scores)
+scores
 
 # Auto-solver -------------------------------------------------------------
 wordle_solver <- function(true_answer,
@@ -229,5 +234,5 @@ if(!file.exists(here("results", "turns_to_solve.csv"))){
   turns_to_solve <- read_csv(here("results", "turns_to_solve.csv"))
 }
 
-summary(turns_to_solve$total_guesses)
-hist(turns_to_solve$total_guesses)
+# summary(turns_to_solve$total_guesses)
+# hist(turns_to_solve$total_guesses)
