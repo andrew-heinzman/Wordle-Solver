@@ -5,7 +5,7 @@ results,new_guess,words_remaining
  -Y--Y,tepal,69
  YY---,tronc,78
  -YG-G,ankle,5
- -Y-G-,shalt,22
+ -Y-G-,slash,22
  YYY--,gland,18
  -YY--,alant,34
  YY--G,bract,26
@@ -33,13 +33,13 @@ results,new_guess,words_remaining
  -GYY-,bancs,5
  -G-YG,butch,9
  -Y-GY,lefty,5
- ----Y,lento,121
+ ----Y,denet,121
  --Y-Y,lined,35
  --G-Y,chynd,15
  --Y-G,lingo,25
  ----G,nould,61
  Y---Y,coted,102
- ---YY,spelt,41
+ ---YY,tweep,41
  --Y--,linty,107
  Y-Y--,grout,23
  --YY-,shout,21
@@ -47,8 +47,8 @@ results,new_guess,words_remaining
  --G--,clint,51
  --GG-,forth,9
  -----,could,168
- Y----,count,103
- ---G-,bhuts,17
+ Y----,cloot,103
+ ---G-,slobs,17
  ---Y-,poynt,80
  Y---G,prong,40
  YYG--,abled,4
@@ -71,7 +71,7 @@ results,new_guess,words_remaining
  -G-YY,easel,1
  -YY-Y,email,3
  ---YG,knots,17
- Y--YY,swoun,18
+ Y--YY,wheep,18
  --GGY,exist,2
  Y-YG-,first,1
  -G-G-,slept,7
@@ -110,7 +110,7 @@ results,new_guess,words_remaining
  GYY--,rival,1
  GY---,royal,4
  GY-G-,roast,1
- G----,muted,10
+ G----,outdo,10
  G--G-,roost,1
  G--Y-,rusty,1
  YG-YY,safer,2

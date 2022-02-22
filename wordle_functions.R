@@ -35,11 +35,25 @@ check_guess <- function(guess, answer){
   guess_vec <- unlist(strsplit(guess, split = ""))
   answer_vec <- unlist(strsplit(answer, split = ""))
 
-  result[map_lgl(guess_vec, ~ .x %in% answer_vec)] <- "Y"  
   result[guess_vec == answer_vec] <- "G"
-  
+  # removing letters that are green
+  answer_vec <- answer_vec[!(guess_vec == answer_vec)]
+  # checking which of the guessed letters are in the set of non-green answer letters
+  for(i in 1:5){
+    if(result[i] != "G"){
+      # if letter appears in different position
+      if(guess_vec[i] %in% answer_vec) {
+        result[i] = "Y"
+        # removing that letter from potential answers
+        answer_vec = answer_vec[-which(answer_vec == guess_vec[i])[1]]
+      }
+    }
+  }
+
   return(paste0(result, collapse = ""))
 }
+# check_guess("troop", "thorn") = "GYG--
+# check_guess("olios", "thorn") = "Y----"
 check_guess <- Vectorize(check_guess)
 
 calc_score <- function(guess, word_list = wordle_answer_list){
