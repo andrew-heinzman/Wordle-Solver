@@ -7,13 +7,13 @@ pacman::p_load(tidyverse,
 plan(multisession) # Setting up parallel processing for future_map
 
 # Reading in word lists ---------------------------------------------------
-# Worlde answer and guess list from Cyrus Freshman via: https://www.reddit.com/r/wordle/comments/s4tcw8/a_note_on_wordles_word_list/
-wordle_answer_list <- read_delim("https://gist.githubusercontent.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b/raw/a9e55d7e0c08100ce62133a1fa0d9c4f0f542f2c/wordle-answers-alphabetical.txt",
+# Answer list directly from NYT
+wordle_answer_list <- read_delim("https://static.nytimes.com/newsgraphics/2022/01/25/wordle-solver/assets/solutions.txt",
                              delim = "\n",
                              col_names = F
                              ) %>% 
   pull()
-
+# Worlde guess list from Cyrus Freshman via: https://www.reddit.com/r/wordle/comments/s4tcw8/a_note_on_wordles_word_list/
 # Allowed guesses that are not possible answers
 wordle_guess_only_list <- read_delim("https://gist.githubusercontent.com/cfreshman/cdcdf777450c5b5301e439061d29694c/raw/975d5100d91ddfe87d99dcee1f01170a43520ea0/wordle-allowed-guesses.txt",
                              delim = "\n",
@@ -173,15 +173,22 @@ play_round <- function(guess, result, prior_word_list,
     "updated_word_list" = updated_word_list
   ))
 }
+play_round_simple <- function(guess, correct_word, word_list){
+  play_round(guess, check_guess(guess, correct_word), word_list)
+}
 
-rnd1 <- play_round("raise", check_guess("raise", "thorn"), wordle_answer_list)
-rnd2 <- play_round("clout", check_guess("clout", "thorn"), rnd1$updated_word_list)
-# rnd3 <- play_round("shill", check_guess("shill", "tacit"), rnd2$updated_word_list)
+rnd1 <- play_round_simple("raise", "sever", wordle_answer_list)
+rnd2 <- play_round_simple("tenor", "sever", rnd1$updated_word_list)
+rnd3 <- play_round_simple("sewed", "sever", rnd2$updated_word_list)
 
-scores <- map_dbl(rnd2$updated_word_list, ~calc_score(.x, rnd2$updated_word_list))
-names(scores) <- rnd2$updated_word_list
-scores <- sort(scores)
-scores
+print_scores <- function(rnd){
+  scores_words <- rnd$updated_word_list
+  scores <- map_dbl(scores_words, ~calc_score(.x, scores_words))
+  names(scores) <- scores_words
+  scores <- sort(scores)
+  print(scores)
+}
+print_scores(rnd1)
 
 # Auto-solver -------------------------------------------------------------
 wordle_solver <- function(true_answer,
@@ -222,7 +229,7 @@ wordle_solver <- function(true_answer,
               "guess_sequence" = guess_sequence))
 }
 
-# wordle_solver("thick")
+# wordle_solver("sever")
 
 # Calculating turns to solve all potential answers ------------------------
 if(!file.exists(here("results", "turns_to_solve.csv"))){
